@@ -24,26 +24,39 @@ app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
+var Game = require('./game.js');
+var Player = require('./player.js');
+
+var playerWaiting = null;
+
+var users = {};
+
 io.sockets.on('connection', function (socket) {
-  socket.on('set nickname', function (name) {
-    socket.set('nickname', name, function () {
-      socket.emit('ready');
-    });
+
+  var newPlayer = new Player(socket);
+
+  if(!playerWaiting){
+    playerWaiting = newPlayer;
+  } else {
+    var game = new Game(playerWaiting, newPlayer);
+    users[playerWaiting.id] = game;
+    users[newPlayer.id] = game;
+    playerWaiting = null;
+  }
+
+  socket.on('send_response', function (response) {
+    newPlayer.cliResponse(response);
   });
 
-  socket.on('msg', function () {
-    socket.get('nickname', function (err, name) {
-      console.log('Chat message by ', name);
-    });
-  });
 });
 
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
-app.get('/users', user.list);
 
 server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
+
+exports.io = io;
