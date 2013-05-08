@@ -4,9 +4,13 @@
 </head>
 <script>
   var socket = io.connect();
-  socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
+  socket.on('ready', function () {
+    console.log('ready');
+    socket.emit('send_response', "");
   });
+  socket.on('new_question', function (question) {
+    console.log(question);
+  });
+
 </script>
 </html>
