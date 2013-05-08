@@ -10,14 +10,18 @@ var Player = function(socket){
 };
 
 Player.prototype.cliResponse = function(response){
-    if (this.response === response){
-        var newQuestion = this.getQuestion();
-        this.socket.emit('new_question', newQuestion);
-    }
-};
-
-Player.prototype.getQuestion = function(){
-    return 'hola';
+  var self = this;
+  if (self.response == response){
+    self.game.getQuestion(function(trans){
+      if(trans){
+        self.response = trans.good;
+        delete trans.good;
+        self.socket.emit('new_question', trans);
+      } else {
+        self.socket.emit('new_question', false);
+      }
+    });
+  }
 };
 
 module.exports = exports = Player;

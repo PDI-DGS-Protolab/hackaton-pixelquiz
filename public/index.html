@@ -1,16 +1,37 @@
 <html>
-<head>
-<script src="/socket.io/socket.io.js"></script>
-</head>
-<script>
-  var socket = io.connect();
-  socket.on('ready', function () {
-    console.log('ready');
-    socket.emit('send_response', "");
-  });
-  socket.on('new_question', function (question) {
-    console.log(question);
-  });
+  <head>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+  </head>
+  <body>
+    <div>
+      <div id="question"></div>
+      <input id="response"/>
+    </div>
+    <div>
+      <ul id="images"/>
+    </div>
+    <script>
+    $("#response").keypress(function(e) {
+      if(e.which == 13) {
+          socket.emit('send_response', $("#response").val());
+      }
+    });
+    var socket = io.connect();
+    socket.on('ready', function () {
+      console.log('ready');
+      socket.emit('send_response', "");
+    });
+    socket.on('new_question', function (question) {
+      if(!question){
+        $("#question").text("Terminado, resuelve la imagen!!");
+        return;
+      }
+      $("#question").text(question.question);
+      $("#response").val("");
+      $("#images").append('<li style="display:inline;"><img src="'+ question.image +'"/></li>');
+    });
 
-</script>
+    </script>
+  </body>
 </html>
