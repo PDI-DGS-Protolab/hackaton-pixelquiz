@@ -1,7 +1,7 @@
 var gm = require('gm');
 
 function splitImage (image, cb) {
-
+  'use strict';
   gm(image).size(function (err, size) {
     var sizeH = size.height / 3;
     var sizeW = size.width / 5;
