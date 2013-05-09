@@ -39,13 +39,13 @@ function splitImage (image, size, callback) {
             splittedImages.push('foo' + i + j +  '.jpg');
             cb(err);
         });
-      }
+      };
     }
     async.parallel(functionsCrop, function(err){
       if(!err){
         callback (splittedImages);
       }
-    })
+    });
   });
 }
 
