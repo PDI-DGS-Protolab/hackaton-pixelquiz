@@ -6,6 +6,7 @@
   <body>
     <div>
       <div id="question"></div>
+      <div id="questionImage"></div>
       <input id="response"/>
       <input id="final"/>
     </div>
@@ -24,8 +25,8 @@
           }
         });
         var socket = io.connect();
-        socket.on('ready', function () {
-          console.log('ready');
+        socket.on('ready', function (data) {
+          $("#questionImage").text(data);
           socket.emit('send_response', "");
         });
         socket.on('new_question', function (question) {
@@ -45,7 +46,10 @@
         });
         socket.on('lose', function(){
           alert('PERDISTE!!');
-        })
+        });
+        socket.on('quit', function(){
+          alert('Tu oponente se ha retirado');
+        });
     </script>
   </body>
 </html>

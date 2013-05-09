@@ -18,11 +18,11 @@ var Game = function(player1, player2){
       self.image = image.content;
       self.shards = contents;
       self.answer = image.answer;
-      console.log(self.answer);
+      self.question = image.question;
 
       self.pushQuestions(function(){
-        self.player1.socket.emit('ready');
-        self.player2.socket.emit('ready');
+        self.player1.socket.emit('ready', self.question);
+        self.player2.socket.emit('ready', self.question);
       });
     });
 
@@ -84,6 +84,16 @@ Game.prototype.win = function(playerWin){
   }
 };
 
+Game.prototype.finish = function(player){
+  var self = this;
+
+  if(this.player1 === player){
+    self.player2.socket.emit('quit');
+  }
+  else if(this.player2 === player){
+    self.player1.socket.emit('quit');
+  }
+};
 
 module.exports = exports = Game;
 

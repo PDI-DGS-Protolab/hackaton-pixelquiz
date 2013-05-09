@@ -10,6 +10,10 @@ var Player = function(socket){
       self.game.finalResponse(self, response);
     });
 
+    socket.on('disconnect', function(){
+      self.game.finish(self);
+    });
+
     return self;
 };
 
