@@ -5,7 +5,7 @@ var options = {};
   options.host = config.popbox.host;
   options.port = config.popbox.port;
   options.method = 'POST';
-  options.headers = {'content-type' : 'application/json', 'accept' : 'application/json'}
+  options.headers = {'content-type' : 'application/json', 'accept' : 'application/json'};
 
 var pushTransaction = function(queueid, payload, cb){
 
@@ -33,10 +33,10 @@ var popQueue = function(queueid, cb){
     res.on('end', function(){
       cb(JSON.parse(result))
       ;
-    })
+    });
   });
   req.end();
-}
+};
 
 exports.pushTransaction = pushTransaction;
 exports.popQueue = popQueue;

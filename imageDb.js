@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/images');
 
 var ImageSchema = mongoose.Schema({
   content: {type: String, required: true},
@@ -47,12 +48,16 @@ function getImages (data, callback) {
   'use strict';
   var contents = [];
   ImageModel.findOne({}, function (err, image) {
-    SplittedImage.find({idCompleteImage: image.id}, function (err, images) {
-      for (var i = 0; i < images.length; i++) {
-        contents.push(images[i].content);
-      }
-      callback(err, image.content, contents);
-    });
+    if (image){
+      SplittedImageModel.find({idCompleteImage: image.id}, function (err, images) {
+        for (var i = 0; i < images.length; i++) {
+          contents.push(images[i].content);
+        }
+        callback(err, image.content, contents);
+      });
+    } else {
+      callback(true);
+    }
   });
 }
 
