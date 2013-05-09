@@ -3,7 +3,7 @@ var imagedb = require('./imageDb');
 var fs = require('fs');
 var async = require('async');
 
-function splitImage (image, name, size, callback) {
+function splitImage (image, size, callback) {
   'use strict';
   gm(image).size(function (err, size) {
     var sizeH = size.height / 3;
@@ -35,8 +35,8 @@ function splitImage (image, name, size, callback) {
     function _crop(i, j, sizeW, sizeH, startW, startH){
       return function(cb){
         gm(image).crop(sizeW, sizeH, startW, startH)
-          .write(name + i + j +  '.jpg', function(err){
-            splittedImages.push(name + i + j +  '.jpg');
+          .write('foo' + i + j +  '.jpg', function(err){
+            splittedImages.push('foo' + i + j +  '.jpg');
             cb(err);
         });
       }
@@ -85,6 +85,7 @@ function addImage (imagePath, name, question, answer, callback) {
         position: i
       };
       imagedb.addSplittedImage(splittedImage, callback);
+      fs.unlinkSync(image);
     }
   }
 }
