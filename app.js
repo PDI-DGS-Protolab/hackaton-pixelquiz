@@ -25,8 +25,6 @@ var Player = require('./player.js');
 
 var playerWaiting = null;
 
-var users = {};
-
 io.sockets.on('connection', function (socket) {
 
   var newPlayer = new Player(socket);
@@ -35,13 +33,11 @@ io.sockets.on('connection', function (socket) {
     playerWaiting = newPlayer;
   } else {
     var game = new Game(playerWaiting, newPlayer);
-    users[playerWaiting.id] = game;
-    users[newPlayer.id] = game;
     playerWaiting = null;
   }
 
-  socket.on('send_response', function (response) {
-    newPlayer.cliResponse(response);
+  newPlayer.emitter.on('die_alone', function(){
+    playerWaiting = null;
   });
 
 });

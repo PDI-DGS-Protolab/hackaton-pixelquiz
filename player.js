@@ -1,8 +1,10 @@
+var events = require('events');
 
 var Player = function(socket){
     var self = this;
     this.id = socket.id;
     self.socket = socket;
+    self.emitter = new events.EventEmitter();
 
     self.response = "";
 
@@ -10,8 +12,16 @@ var Player = function(socket){
       self.game.finalResponse(self, response);
     });
 
-    socket.on('disconnect', function(){
-      self.game.finish(self);
+    self.socket.on('send_response', function (response) {
+      self.cliResponse(response);
+    });
+    self.socket.on('disconnect', function(){
+      self.emitter.emit('die');
+      if(self.game){
+        self.game.finish(self);
+      } else {
+        self.emitter.emit('die_alone');
+      }
     });
 
     return self;
