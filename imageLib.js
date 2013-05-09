@@ -3,7 +3,7 @@ var imagedb = require('./imageDb');
 var fs = require('fs');
 var async = require('async');
 
-function splitImage (image, name, size, callback) {
+function splitImage (image, size, callback) {
   'use strict';
   gm(image).size(function (err, size) {
     var sizeH = size.height / 3;
@@ -35,25 +35,24 @@ function splitImage (image, name, size, callback) {
     function _crop(i, j, sizeW, sizeH, startW, startH){
       return function(cb){
         gm(image).crop(sizeW, sizeH, startW, startH)
-          .write(name + i + j +  '.jpg', function(err){
-            splittedImages.push(name + i + j +  '.jpg');
+          .write('foo' + i + j +  '.jpg', function(err){
+            splittedImages.push('foo' + i + j +  '.jpg');
             cb(err);
         });
-      }
+      };
     }
     async.parallel(functionsCrop, function(err){
       if(!err){
         callback (splittedImages);
       }
-    })
+    });
   });
 }
 
-function addImage (imagePath, name, question, answer, callback) {
+function addImage (imagePath, question, answer, callback) {
   'use strict';
   var imageRead = fs.readFileSync(imagePath);
   var base64content = imageRead.toString('base64');
-  console.log(base64content);
   gm(imagePath).size(function (err, size) {
     var image = {
       content: base64content,
@@ -63,7 +62,7 @@ function addImage (imagePath, name, question, answer, callback) {
       width: size.width
     };
     imagedb.addImage(image, function (err, id) {
-      splitImage(imagePath, name, size, function (splittedImages) {
+      splitImage(imagePath, size, function (splittedImages) {
         var splitFunc = [];
         for (var i = 0; i < splittedImages.length; i++) {
           splitFunc.push(_addSplittedImage(i, id, splittedImages[i]));
@@ -85,7 +84,8 @@ function addImage (imagePath, name, question, answer, callback) {
         position: i
       };
       imagedb.addSplittedImage(splittedImage, callback);
-    }
+      fs.unlinkSync(image);
+    };
   }
 }
 

@@ -9,6 +9,16 @@ var ImageSchema = mongoose.Schema({
   width: {type: Number, required: true}
 });
 
+ImageSchema.statics.random = function(callback) {
+  this.count(function(err, count) {
+    if (err) {
+      return callback(err);
+    }
+    var rand = Math.floor(Math.random() * count);
+    this.findOne().skip(rand).exec(callback);
+  }.bind(this));
+};
+
 var SplittedImageSchema = mongoose.Schema({
   idCompleteImage: {type: String, required: true},
   content: {type: String, required: true},
@@ -49,7 +59,7 @@ function addSplittedImage (data, callback) {
 function getImages (callback) {
   'use strict';
   var contents = [];
-  ImageModel.findOne({}, function (err, image) {
+  getRandom(function (err, image) {
     if (image){
       SplittedImageModel.find({idCompleteImage: image.id}, function (err, images) {
         for (var i = 0; i < images.length; i++) {
@@ -62,6 +72,10 @@ function getImages (callback) {
     }
   });
 }
+
+var getRandom = function(callback){
+  ImageModel.random(callback);
+};
 
 exports.addImage = addImage;
 exports.addSplittedImage = addSplittedImage;
