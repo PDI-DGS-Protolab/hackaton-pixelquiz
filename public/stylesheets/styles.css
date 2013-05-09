@@ -12,7 +12,7 @@ h1, h2, h3, h4, h5, h6 {
 
 
 html, body {
-	overflow: hidden;
+	overflow: auto;
 	min-width: 100%;
 	max-width: 100%;
 	width: 100%;
@@ -28,8 +28,7 @@ html, body {
 
 body {
 	position: relative;
-    width: 1280px;
-    padding: 0 54px 0 54px;
+    padding: 0;
     margin: 0 auto 0 auto;
     clear: both;
 }
@@ -91,7 +90,7 @@ a:hover {
     position: relative;
     height: 100%;
     margin: 0 auto 0 auto;
-    min-height: 900px;
+    min-height: 100%;
     clear:both;
     width: 75%;
     overflow:hidden;
@@ -104,6 +103,7 @@ article {
     box-sizing: border-box;
     width: 50%;
     height: 100%;
+    vertical-align: center;
 }
 
 section {
