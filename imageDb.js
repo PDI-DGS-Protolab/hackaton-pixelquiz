@@ -4,15 +4,15 @@ mongoose.connect('mongodb://localhost/images');
 var ImageSchema = mongoose.Schema({
   content: {type: String, required: true},
   question: {type: String, required: true},
-  answer: {type: String, required: true}
+  answer: {type: String, required: true},
+  height: {type: Number, required: true},
+  width: {type: Number, required: true}
 });
 
 var SplittedImageSchema = mongoose.Schema({
   idCompleteImage: {type: String, required: true},
   content: {type: String, required: true},
-  position: {type: Number, required: true},
-  height: {type: Number, required: true},
-  width: {type: Number, required: true}
+  position: {type: Number, required: true}
 });
 
 var ImageModel = mongoose.model('ImageModel', ImageSchema);
@@ -35,16 +35,18 @@ function addImage (data, callback) {
 function addSplittedImage (data, callback) {
   'use strict';
   var image = new SplittedImageModel({
-    idCompleteImage: data.idImage,
+    idCompleteImage: data.idCompleteImage,
     content: data.content,
     position: data.position
   });
   image.save(function (err) {
-    callback(err);
+    if(callback){
+      callback(err);
+    }
   });
 }
 
-function getImages (data, callback) {
+function getImages (callback) {
   'use strict';
   var contents = [];
   ImageModel.findOne({}, function (err, image) {
@@ -53,7 +55,7 @@ function getImages (data, callback) {
         for (var i = 0; i < images.length; i++) {
           contents.push(images[i].content);
         }
-        callback(err, image.content, contents);
+        callback(err, image, contents);
       });
     } else {
       callback(true);

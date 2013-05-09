@@ -17,8 +17,8 @@ var Game = function(player1, player2){
     imagedb.getImages(function (err, image, contents){
       self.image = image.content;
       self.shards = contents;
-      //self.answer = image.answer;
-      self.answer = "hola";
+      self.answer = image.answer;
+      console.log(self.answer);
 
       self.pushQuestions(function(){
         self.player1.socket.emit('ready');
@@ -64,7 +64,7 @@ Game.prototype.pushQuestions = function(done){
 };
 
 Game.prototype.finalResponse = function(player, response){
-  if (response == this.anwser){
+  if (response === this.answer){
     this.win(player);
   } else {
     player.socket.emit('no_correct');
@@ -72,6 +72,8 @@ Game.prototype.finalResponse = function(player, response){
 };
 
 Game.prototype.win = function(playerWin){
+  var self = this;
+
   if(this.player1 === playerWin){
     self.player1.socket.emit('win');
     self.player2.socket.emit('lose');

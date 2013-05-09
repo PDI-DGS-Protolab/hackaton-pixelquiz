@@ -1,6 +1,7 @@
 var gm = require('gm');
 var imagedb = require('./imageDb');
 var fs = require('fs');
+var async = require('async');
 
 function splitImage (image, name, size, callback) {
   'use strict';
@@ -22,24 +23,37 @@ function splitImage (image, name, size, callback) {
       startW.push(startW[startW.length - 1] + sizeW);
     }
 
+    var functionsCrop = [];
+
     for (var i = 0; i < 3; i++) {
       for (var j = 0; j < 5; j++) {
         if (!err) {
-          gm(image).crop(sizeW, sizeH, startW[j], startH[i])
-            .write(name + i + j +  '.jpg', function(err){
-              splittedImages.push(name + i + j +  '.jpg');
-          });
+          functionsCrop.push(_crop(i, j, sizeW, sizeH, startW[j], startH[i]));
         }
       }
     }
+    function _crop(i, j, sizeW, sizeH, startW, startH){
+      return function(cb){
+        gm(image).crop(sizeW, sizeH, startW, startH)
+          .write(name + i + j +  '.jpg', function(err){
+            splittedImages.push(name + i + j +  '.jpg');
+            cb(err);
+        });
+      }
+    }
+    async.parallel(functionsCrop, function(err){
+      if(!err){
+        callback (splittedImages);
+      }
+    })
   });
-  callback (splittedImages);
 }
 
 function addImage (imagePath, name, question, answer, callback) {
   'use strict';
   var imageRead = fs.readFileSync(imagePath);
   var base64content = imageRead.toString('base64');
+  console.log(base64content);
   gm(imagePath).size(function (err, size) {
     var image = {
       content: base64content,
@@ -48,23 +62,31 @@ function addImage (imagePath, name, question, answer, callback) {
       height: size.height,
       width: size.width
     };
-    var splittedImage = {};
-    imagedb.addImage(base64content, function (err, id) {
+    imagedb.addImage(image, function (err, id) {
       splitImage(imagePath, name, size, function (splittedImages) {
+        var splitFunc = [];
         for (var i = 0; i < splittedImages.length; i++) {
-          imageRead = fs.readFileSync(splittedImages[i]);
-          base64content = imageRead.toString('base64');
-          splittedImage = {
-            idCompleteImage: id,
-            content: base64content,
-            position: i
-          };
-          imagedb.addSplittedImage(splittedImage);
+          splitFunc.push(_addSplittedImage(i, id, splittedImages[i]));
         }
+        async.parallel(splitFunc, function(){
+          callback(true);
+        });
       });
     });
   });
-  callback ();
+
+  function _addSplittedImage(i, id, image){
+    return function(callback){
+      imageRead = fs.readFileSync(image);
+      base64content = imageRead.toString('base64');
+      var splittedImage = {
+        idCompleteImage: id,
+        content: base64content,
+        position: i
+      };
+      imagedb.addSplittedImage(splittedImage, callback);
+    }
+  }
 }
 
-exports.splitImage = splitImage;
+exports.addImage = addImage;

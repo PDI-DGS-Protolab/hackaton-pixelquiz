@@ -35,11 +35,17 @@
           }
           $("#question").text(question.question);
           $("#response").val("");
-          $("#images").append('<li style="display:inline;"><img src="'+ question.image +'"/></li>');
+          $("#images").append('<li style="display:inline;"><img src="data:image/jpg;base64,'+ question.image +'"/></li>');
         });
         socket.on('no_correct', function () {
           alert('NO CORRECT');
         });
+        socket.on('win', function () {
+          alert('GANASTE!!');
+        });
+        socket.on('lose', function(){
+          alert('PERDISTE!!');
+        })
     </script>
   </body>
 </html>
