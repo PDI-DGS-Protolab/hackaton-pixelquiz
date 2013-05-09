@@ -8,7 +8,10 @@ var ImageSchema = mongoose.Schema({
 
 var SplittedImageSchema = mongoose.Schema({
   idCompleteImage: {type: String, required: true},
-  content: {type: String, required: true}
+  content: {type: String, required: true},
+  position: {type: Number, required: true},
+  height: {type: Number, required: true},
+  width: {type: Number, required: true}
 });
 
 var ImageModel = mongoose.model('ImageModel', ImageSchema);
@@ -19,7 +22,9 @@ function addImage (data, callback) {
   var image = new ImageModel({
     content: data.content,
     question: data.question,
-    answer: data.answer
+    answer: data.answer,
+    height: data.height,
+    width: data.width
   });
   image.save(function (err) {
     callback(err, image.id);
@@ -30,7 +35,8 @@ function addSplittedImage (data, callback) {
   'use strict';
   var image = new SplittedImageModel({
     idCompleteImage: data.idImage,
-    content: data.content
+    content: data.content,
+    position: data.position
   });
   image.save(function (err) {
     callback(err);
