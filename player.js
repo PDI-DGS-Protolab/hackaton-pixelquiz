@@ -1,12 +1,16 @@
 
 var Player = function(socket){
-    this.game;
+    var self = this;
     this.id = socket.id;
-    this.socket = socket;
+    self.socket = socket;
 
-    this.response = "";
+    self.response = "";
 
-    return this;
+    self.socket.on('final_response', function(response){
+      self.game.finalResponse(self, response);
+    });
+
+    return self;
 };
 
 Player.prototype.cliResponse = function(response){

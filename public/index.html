@@ -7,31 +7,45 @@
     <div>
       <div id="question"></div>
       <input id="response"/>
+      <input id="final"/>
     </div>
     <div>
       <ul id="images"/>
     </div>
     <script>
-    $("#response").keypress(function(e) {
-      if(e.which == 13) {
-          socket.emit('send_response', $("#response").val());
-      }
-    });
-    var socket = io.connect();
-    socket.on('ready', function () {
-      console.log('ready');
-      socket.emit('send_response', "");
-    });
-    socket.on('new_question', function (question) {
-      if(!question){
-        $("#question").text("Terminado, resuelve la imagen!!");
-        return;
-      }
-      $("#question").text(question.question);
-      $("#response").val("");
-      $("#images").append('<li style="display:inline;"><img src="'+ question.image +'"/></li>');
-    });
-
+        $("#response").keypress(function(e) {
+          if(e.which == 13) {
+              socket.emit('send_response', $("#response").val());
+          }
+        });
+        $("#final").keypress(function(e) {
+          if(e.which == 13) {
+              socket.emit('final_response', $("#final").val());
+          }
+        });
+        var socket = io.connect();
+        socket.on('ready', function () {
+          console.log('ready');
+          socket.emit('send_response', "");
+        });
+        socket.on('new_question', function (question) {
+          if(!question){
+            $("#question").text("Terminado, resuelve la imagen!!");
+            return;
+          }
+          $("#question").text(question.question);
+          $("#response").val("");
+          $("#images").append('<li style="display:inline;"><img src="data:image/jpg;base64,'+ question.image +'"/></li>');
+        });
+        socket.on('no_correct', function () {
+          alert('NO CORRECT');
+        });
+        socket.on('win', function () {
+          alert('GANASTE!!');
+        });
+        socket.on('lose', function(){
+          alert('PERDISTE!!');
+        })
     </script>
   </body>
 </html>

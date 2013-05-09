@@ -1,17 +1,28 @@
 var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/images');
 
 var ImageSchema = mongoose.Schema({
   content: {type: String, required: true},
   question: {type: String, required: true},
-  answer: {type: String, required: true}
+  answer: {type: String, required: true},
+  height: {type: Number, required: true},
+  width: {type: Number, required: true}
 });
+
+ImageSchema.statics.random = function(callback) {
+  this.count(function(err, count) {
+    if (err) {
+      return callback(err);
+    }
+    var rand = Math.floor(Math.random() * count);
+    this.findOne().skip(rand).exec(callback);
+  }.bind(this));
+};
 
 var SplittedImageSchema = mongoose.Schema({
   idCompleteImage: {type: String, required: true},
   content: {type: String, required: true},
-  position: {type: Number, required: true},
-  height: {type: Number, required: true},
-  width: {type: Number, required: true}
+  position: {type: Number, required: true}
 });
 
 var ImageModel = mongoose.model('ImageModel', ImageSchema);
@@ -34,27 +45,37 @@ function addImage (data, callback) {
 function addSplittedImage (data, callback) {
   'use strict';
   var image = new SplittedImageModel({
-    idCompleteImage: data.idImage,
+    idCompleteImage: data.idCompleteImage,
     content: data.content,
     position: data.position
   });
   image.save(function (err) {
-    callback(err);
+    if(callback){
+      callback(err);
+    }
   });
 }
 
-function getImages (data, callback) {
+function getImages (callback) {
   'use strict';
   var contents = [];
-  ImageModel.findOne({}, function (err, image) {
-    SplittedImage.find({idCompleteImage: image.id}, function (err, images) {
-      for (var i = 0; i < images.length; i++) {
-        contents.push(images[i].content);
-      }
-      callback(err, image.content, contents);
-    });
+  getRandom(function (err, image) {
+    if (image){
+      SplittedImageModel.find({idCompleteImage: image.id}, function (err, images) {
+        for (var i = 0; i < images.length; i++) {
+          contents.push(images[i].content);
+        }
+        callback(err, image, contents);
+      });
+    } else {
+      callback(true);
+    }
   });
 }
+
+var getRandom = function(callback){
+  ImageModel.random(callback);
+};
 
 exports.addImage = addImage;
 exports.addSplittedImage = addSplittedImage;
