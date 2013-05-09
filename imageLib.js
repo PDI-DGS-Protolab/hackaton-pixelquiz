@@ -49,11 +49,10 @@ function splitImage (image, size, callback) {
   });
 }
 
-function addImage (imagePath, name, question, answer, callback) {
+function addImage (imagePath, question, answer, callback) {
   'use strict';
   var imageRead = fs.readFileSync(imagePath);
   var base64content = imageRead.toString('base64');
-  console.log(base64content);
   gm(imagePath).size(function (err, size) {
     var image = {
       content: base64content,
@@ -63,7 +62,7 @@ function addImage (imagePath, name, question, answer, callback) {
       width: size.width
     };
     imagedb.addImage(image, function (err, id) {
-      splitImage(imagePath, name, size, function (splittedImages) {
+      splitImage(imagePath, size, function (splittedImages) {
         var splitFunc = [];
         for (var i = 0; i < splittedImages.length; i++) {
           splitFunc.push(_addSplittedImage(i, id, splittedImages[i]));
@@ -86,7 +85,7 @@ function addImage (imagePath, name, question, answer, callback) {
       };
       imagedb.addSplittedImage(splittedImage, callback);
       fs.unlinkSync(image);
-    }
+    };
   }
 }
 
