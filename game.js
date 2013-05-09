@@ -45,10 +45,6 @@ Game.prototype.pushQuestions = function(done){
   var gameId = this.id;
   var shards = this.shards;
 
-  var res = genRandom();
-  var question = "¿ " + res.num1 + " + " + res.num2 + " ?";
-  pushFunc.push(_push(question,res.res,""));
-
   for(var i=0; i< shards.length; i++){
     var res = genRandom();
     var question = "¿ " + res.num1 + " + " + res.num2 + " ?";
@@ -84,12 +80,12 @@ Game.prototype.win = function(playerWin){
   var self = this;
 
   if(this.player1 === playerWin){
-    self.player1.socket.emit('win');
-    self.player2.socket.emit('lose');
+    self.player1.socket.emit('win', self.image);
+    self.player2.socket.emit('lose', self.image);
   }
   else if(this.player2 === playerWin){
-    self.player1.socket.emit('lose');
-    self.player2.socket.emit('win');
+    self.player1.socket.emit('lose', self.image);
+    self.player2.socket.emit('win', self.image);
   }
 };
 

@@ -63,7 +63,7 @@ function getImages (callback) {
     if (image){
       SplittedImageModel.find({idCompleteImage: image.id}, function (err, images) {
         for (var i = 0; i < images.length; i++) {
-          contents.push(images[i].content);
+          contents.push({image : images[i].content, position : images[i].position});
         }
         callback(err, image, contents);
       });

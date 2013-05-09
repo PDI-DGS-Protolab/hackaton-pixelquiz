@@ -63,23 +63,30 @@
           }
           $("#question").text(question.question);
           $("#response").val("");
-          $("#images").append('<img src="data:image/jpg;base64,'+ question.image +'"/>');
+          $("#images").append('<img style="' + calculate(question.image.position) + '" src="data:image/jpg;base64,'+ question.image.image +'"/>');
         });
         socket.on('no_correct', function () {
           alert('NO CORRECT');
         });
-        socket.on('win', function () {
+        socket.on('win', function (image){
+          $("#images").html('<img style="width : 100%; height : 100%" src="data:image/jpg;base64,'+ image +'"/>');
           alert('GANASTE!!');
         });
-        socket.on('lose', function(){
+        socket.on('lose', function(image){
+          $("#images").html('<img style="width : 100%; height : 100%" src="data:image/jpg;base64,'+ image +'"/>');
           alert('PERDISTE!!');
         });
         socket.on('quit', function(){
           alert('Tu oponente se ha retirado');
         });
+
+        function calculate(position){
+          var right = position % 3;
+          var top= Math.floor(position / 3);
+          return "right : " + (33.33 * right) + "%; top : " + (20 * top) + "%;"
+        }
     </script>
 
 </body>
 
 </html>
-
