@@ -1,17 +1,43 @@
-<html>
-  <head>
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pixel Quiz</title>
+    <link type="text/css" rel="stylesheet" media="all" href="stylesheets/styles.css" />
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
-  </head>
-  <body>
-    <div>
-      <div id="question"></div>
-      <div id="questionImage"></div>
-      <input id="response"/>
-      <input id="final"/>
-    </div>
-    <div>
-      <ul id="images"/>
+</head>
+
+<body>
+    <div class="container">
+      <header class="header">
+                  <h1 class="title">Pixel Quiz</h1>
+      </header>
+
+      <article class="questions">
+        <section class="description">
+          <p id="description">¿Serás capaz de adivinar qué es la imagen antes que tu contrincante?</p>
+          <p id="rules">Responde correctamente las preguntas para ir obteniendo pedazos de la imagen. Cuando sepas lo que es, resuelve, pero ¡cuidado! si fallas perderás un pedazo de imagen.</p>
+          <p id="play">Esperando a tu oponente...</p>
+        </section>
+        <section class="question">
+          <p id="question">...</p>
+          <input id="response" />
+        </section>
+    </article>
+    <article>
+      <!--<iframe src="#">Foto</iframe>-->
+      <div id="images"></div>
+      <section class="solution">
+        <p id="questionImage"></p>
+        <input id="answer" />
+      </section>
+    </article>
+
+    <footer class="footer">
+        <p class="foot">&copy; Open Innovation Lasboratory, Universidad Politécnica de Madrid, 2013</p>
+    </footer>
     </div>
     <script>
         $("#response").keypress(function(e) {
@@ -19,13 +45,14 @@
               socket.emit('send_response', $("#response").val());
           }
         });
-        $("#final").keypress(function(e) {
+        $("#answer").keypress(function(e) {
           if(e.which == 13) {
-              socket.emit('final_response', $("#final").val());
+              socket.emit('final_response', $("#answer").val());
           }
         });
         var socket = io.connect();
         socket.on('ready', function (data) {
+          $("#play").text("¡¡Empieza el juego!!");
           $("#questionImage").text(data);
           socket.emit('send_response', "");
         });
@@ -36,7 +63,7 @@
           }
           $("#question").text(question.question);
           $("#response").val("");
-          $("#images").append('<li style="display:inline;"><img src="data:image/jpg;base64,'+ question.image +'"/></li>');
+          $("#images").append('<img src="data:image/jpg;base64,'+ question.image +'"/>');
         });
         socket.on('no_correct', function () {
           alert('NO CORRECT');
@@ -51,5 +78,8 @@
           alert('Tu oponente se ha retirado');
         });
     </script>
-  </body>
+
+</body>
+
 </html>
+
