@@ -61,8 +61,8 @@ Game.prototype.pushQuestions = function(done){
 
   function genRandom(){
     var num1, num2, res;
-    num1 = Math.floor(Math.random() * 10);
-    num2 = Math.floor(Math.random() * 10);
+    num1 = Math.floor(Math.random() * 100);
+    num2 = Math.floor(Math.random() * 100);
     res = num1 + num2;
     return {num1:num1, num2:num2, res:res};
   }
