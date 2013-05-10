@@ -6,27 +6,25 @@ var async = require('async');
 function splitImage (image, size, callback) {
   'use strict';
   gm(image).size(function (err, size) {
-    var sizeH = size.height / 3;
-    var sizeW = size.width / 5;
+    var sizeH = size.height / 5;
+    var sizeW = size.width / 3;
     var startH = [];
     var splittedImages = [];
 
-    startH.push(0);
-    startH.push(sizeH);
-    startH.push(startH[startH.length - 1] + sizeH);
-    console.log(startH);
-
-
-    var startW = [];
     startW.push(0);
+    startW.push(sizeW);
+    startW.push(startW[startW.length - 1] + sizeW);
+
+    var startH = [];
+    startH.push(0);
     for (var k = 0; k < 4; k++) {
-      startW.push(startW[startW.length - 1] + sizeW);
+      startH.push(startH[startH.length - 1] + sizeH);
     }
 
     var functionsCrop = [];
 
-    for (var i = 0; i < 3; i++) {
-      for (var j = 0; j < 5; j++) {
+    for (var i = 0; i < 5; i++) {
+      for (var j = 0; j < 3; j++) {
         if (!err) {
           functionsCrop.push(_crop(i, j, sizeW, sizeH, startW[j], startH[i]));
         }
