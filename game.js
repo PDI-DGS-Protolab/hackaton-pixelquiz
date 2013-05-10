@@ -18,11 +18,11 @@ var Game = function(player1, player2){
       self.image = image.content;
       self.shards = contents;
       self.answer = image.answer;
-      console.log(self.answer);
+      self.question = image.question;
 
       self.pushQuestions(function(){
-        self.player1.socket.emit('ready');
-        self.player2.socket.emit('ready');
+        self.player1.socket.emit('ready', self.question);
+        self.player2.socket.emit('ready', self.question);
       });
     });
 
@@ -45,21 +45,26 @@ Game.prototype.pushQuestions = function(done){
   var gameId = this.id;
   var shards = this.shards;
 
-  for(var i=0; i<shards.length; i++){
-    pushFunc.push(_push(shards[i]));
+  for(var i=0; i< shards.length; i++){
+    var res = genRandom();
+    var question = "¿ " + res.num1 + " + " + res.num2 + " ?";
+    pushFunc.push(_push(question,res.res,shards[i]));
   }
 
   async.parallel(pushFunc, done);
 
-  function _push(shard){
+  function _push(question, res, shard){
     return function(cb){
-      var num1, num2, res;
-      num1 = Math.floor(Math.random() * 10);
-      num2 = Math.floor(Math.random() * 10);
-      res = num1 + num2;
-
-      pbCli.pushTransaction(gameId, {question : num1 + " + " + num2 + " es...", good : res, image : shard}, cb);
+      pbCli.pushTransaction(gameId, {question : question, good : res, image : shard}, cb);
     };
+  }
+
+  function genRandom(){
+    var num1, num2, res;
+    num1 = Math.floor(Math.random() * 100);
+    num2 = Math.floor(Math.random() * 100);
+    res = num1 + num2;
+    return {num1:num1, num2:num2, res:res};
   }
 };
 
@@ -75,15 +80,25 @@ Game.prototype.win = function(playerWin){
   var self = this;
 
   if(this.player1 === playerWin){
-    self.player1.socket.emit('win');
-    self.player2.socket.emit('lose');
+    self.player1.socket.emit('win', self.image);
+    self.player2.socket.emit('lose', self.image);
   }
   else if(this.player2 === playerWin){
-    self.player1.socket.emit('lose');
-    self.player2.socket.emit('win');
+    self.player1.socket.emit('lose', self.image);
+    self.player2.socket.emit('win', self.image);
   }
 };
 
+Game.prototype.finish = function(player){
+  var self = this;
+
+  if(this.player1 === player){
+    self.player2.socket.emit('quit');
+  }
+  else if(this.player2 === player){
+    self.player1.socket.emit('quit');
+  }
+};
 
 module.exports = exports = Game;
 
